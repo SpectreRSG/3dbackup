@@ -41,10 +41,23 @@ class App(tk.Tk):
         self._jobs = queue.Queue()
 
         self.title(APP_TITLE)
+        self._set_icon()
         self.geometry("1150x720")
         self.minsize(760, 480)
         self._build()
         self.after(100, self._poll_jobs)
+
+    def _set_icon(self):
+        """Use our icon in the title bar. Inside the .exe it is unpacked to a
+        temporary folder (sys._MEIPASS); when run from source it's in packaging/."""
+        import sys
+        here = Path(getattr(sys, "_MEIPASS", Path(__file__).resolve().parents[1] / "packaging"))
+        icon = here / "icon.ico"
+        try:
+            if icon.exists() and sys.platform.startswith("win"):
+                self.iconbitmap(default=str(icon))
+        except tk.TclError:
+            pass   # not important - just keep the standard icon
 
     # ------------------------------------------------------------------
     # Building the window

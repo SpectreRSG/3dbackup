@@ -1,0 +1,63 @@
+# Builds the Windows .exe files on a Windows computer that GitHub lends us.
+#
+# * Every push: the .exe files are attached to the run as a download
+#   (GitHub > Actions tab > click the run > "Artifacts" at the bottom).
+# * Pushing a version tag like "v1.0.0" also publishes them on the
+#   repository's Releases page, where anyone can download them.
+name: Build Windows exe
+
+on:
+  push:
+    branches: ["**"]
+    tags: ["v*"]
+  pull_request:
+  workflow_dispatch:   # adds a "Run workflow" button on the Actions tab
+
+permissions:
+  contents: write      # needed to create a Release for version tags
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - name: Get the code
+        uses: actions/checkout@v4
+
+      - name: Install Python (only used to build - the exe has its own copy)
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Run the automatic tests
+        run: python -m unittest discover tests -v
+
+      - name: Install PyInstaller
+        run: python -m pip install pyinstaller==6.22.3
+
+      - name: Build the exe files
+        run: python packaging/build.py
+
+      - name: Check the exe works
+        shell: pwsh
+        run: |
+          & ".\dist\3dbackup-cli.exe" --version
+          & ".\dist\3dbackup-cli.exe" scan --all
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+
+      - name: Put everything in a zip
+        shell: pwsh
+        run: |
+          Copy-Item README.md dist\
+          Compress-Archive -Path dist\* -DestinationPath 3D-Print-Backup-Windows.zip
+
+      - name: Attach the zip to this run
+        uses: actions/upload-artifact@v4
+        with:
+          name: 3D-Print-Backup-Windows
+          path: dist/
+
+      - name: Publish a Release (version tags only)
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: 3D-Print-Backup-Windows.zip

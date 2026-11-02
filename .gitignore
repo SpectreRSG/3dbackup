@@ -2,3 +2,5 @@ __pycache__/
 *.pyc
 *.3dbackup
 *.partial
+build/
+dist/

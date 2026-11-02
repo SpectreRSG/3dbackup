@@ -39,7 +39,26 @@ nothing on your computer to back up.
 
 ---
 
-## How to use it
+## Download for Windows (easiest – no Python needed)
+
+1. Go to this repository's **Releases** page (right‑hand side on GitHub) and download
+   **`3D-Print-Backup-Windows.zip`**.
+2. Unzip it. Inside are:
+   * **`3D Print Backup.exe`** – the window version. **This is the one you want.**
+   * `3dbackup-cli.exe` – the terminal version, for typed commands (see below).
+3. Double‑click **`3D Print Backup.exe`**.
+
+Python is built into the `.exe`, so you don't need to install anything.
+
+> **"Windows protected your PC"?** Windows shows this for programs that aren't
+> "signed" (signing costs money each year). Click **More info → Run anyway**.
+
+**Tip:** right‑click a `.3dbackup` file → **Open with** → **Choose another app** → pick
+`3D Print Backup.exe` and tick "Always". Now double‑clicking a backup opens it.
+
+---
+
+## Running from the source code (Windows, Mac or Linux)
 
 ### 1. Install Python (one time)
 
@@ -73,7 +92,8 @@ The window scans your computer straight away. Then:
   slicer first!
 * **📤 Save file as…** – save just one profile file somewhere, e.g. to import it by hand.
 
-**The terminal way (commands):**
+**The terminal way (commands):** (with the Windows download, type `3dbackup-cli.exe`
+instead of `python 3dbackup.py`)
 
 ```
 python 3dbackup.py scan                       # what was found?
@@ -140,7 +160,11 @@ writing any data using only letters and numbers.
 
 | File | What it does |
 |---|---|
-| `3dbackup.py` | The file you run. It just starts the program. |
+| `3dbackup.py` | Starts the program (window, or terminal commands if you add some). |
+| `3dbackup_gui.pyw` | Starts the window only. This becomes `3D Print Backup.exe`. |
+| `packaging/build.py` | Packs everything (Python included) into `.exe` files using PyInstaller. |
+| `build_exe.bat` | Double‑click on Windows to build the `.exe` files yourself. |
+| `.github/workflows/build.yml` | Tells GitHub to build the `.exe` on a Windows computer automatically. |
 | `backup3d/apps.py` | **The list of programs** and where each keeps its settings. |
 | `backup3d/detect.py` | Searches the computer: finds the folders and picks which files to keep. |
 | `backup3d/backup.py` | Makes, saves, opens and restores `.3dbackup` files. Also sorts files into categories. |
@@ -170,3 +194,18 @@ AppDef(
 
 `{APPDATA}` etc. are filled in automatically (the list is at the top of `apps.py`), and
 `*` means "anything" – useful for version folders like `cura/5.8`.
+
+## How the `.exe` is made
+
+A tool called **PyInstaller** bundles Python, this code and everything it needs into one
+`.exe` file. It can only make Windows programs *on* Windows, so GitHub does it for us:
+
+* **Every time code is pushed**, GitHub builds the `.exe` files on a Windows computer.
+  Download them from the **Actions** tab → click the latest run → **Artifacts**.
+* **To publish a version** for everyone, create a *tag* such as `v1.0.0`
+  (GitHub → Releases → **Draft a new release** → type `v1.0.0` as the tag →
+  **Publish**). A minute or two later the zip appears on that release.
+
+To build it on your own Windows PC instead: install Python, then double‑click
+`build_exe.bat`. The `.exe` files appear in the `dist` folder.
+
