@@ -81,16 +81,15 @@ python 3dbackup.py
 
 (On Mac/Linux you may need to type `python3` instead of `python`.)
 
-The window scans your computer straight away. Then:
+The window has just two choices:
 
-* **💾 Create backup…** – choose where to save the `.3dbackup` file.
-* **📂 Open backup…** – open a backup to look through it.
-* Click a program → a category → a profile on the left to see its settings on the right.
-  Use **Search settings** to find e.g. `temperature`. Click a row to see long values
-  (like start G‑code) in full.
-* **↩ Restore…** – select a program (or a single file) and click Restore. Close the
-  slicer first!
-* **📤 Save file as…** – save just one profile file somewhere, e.g. to import it by hand.
+* **Back up** – finds your programs, shows what it found, then **Save backup…**.
+* **Open a backup** – profiles are on the left. Click one to see its settings on the
+  right; type in **Search settings** to find e.g. `temperature`. Click a long value
+  (like start G‑code) to see all of it.
+  The blue button at the top restores whatever you have selected – one profile, one
+  program, or everything. Close the slicer first. You can also choose
+  **Save to a folder instead** to just get the files.
 
 **The terminal way (commands):** (with the Windows download, type `3dbackup-cli.exe`
 instead of `python 3dbackup.py`)
