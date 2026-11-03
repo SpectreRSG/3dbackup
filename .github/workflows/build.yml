@@ -2,8 +2,14 @@
 #
 # * Every push: the .exe files are attached to the run as a download
 #   (GitHub > Actions tab > click the run > "Artifacts" at the bottom).
-# * Pushing a version tag like "v1.0.0" also publishes them on the
-#   repository's Releases page, where anyone can download them.
+# * A Release (public download on the Releases page, used by the website's
+#   Download button) is published when:
+#     - a version tag like "v1.0.0" is pushed,
+#     - code is pushed to the main branch, or
+#     - you run it by hand: Actions tab > Build Windows exe > Run workflow,
+#       tick "Publish a release".
+#   The release is named after the version in backup3d/__init__.py, so
+#   bump that number for a new release.
 name: Build Windows exe
 
 on:
@@ -12,6 +18,11 @@ on:
     tags: ["v*"]
   pull_request:
   workflow_dispatch:   # adds a "Run workflow" button on the Actions tab
+    inputs:
+      publish:
+        description: "Publish a release"
+        type: boolean
+        default: false
 
 permissions:
   contents: write      # needed to create a Release for version tags
@@ -56,8 +67,26 @@ jobs:
           name: 3D-Print-Backup-Windows
           path: dist/
 
-      - name: Publish a Release (version tags only)
-        if: startsWith(github.ref, 'refs/tags/v')
+      - name: Work out the version number
+        id: version
+        shell: pwsh
+        run: |
+          $v = python -c "import backup3d; print(backup3d.__version__)"
+          "tag=v$v" >> $env:GITHUB_OUTPUT
+
+      - name: Publish a Release
+        if: >-
+          startsWith(github.ref, 'refs/tags/v') ||
+          (github.event_name == 'push' && github.ref_name == github.event.repository.default_branch) ||
+          (github.event_name == 'workflow_dispatch' && inputs.publish)
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ startsWith(github.ref, 'refs/tags/v') && github.ref_name || steps.version.outputs.tag }}
+          target_commitish: ${{ github.sha }}
+          name: 3D Print Backup ${{ startsWith(github.ref, 'refs/tags/v') && github.ref_name || steps.version.outputs.tag }}
+          body: |
+            Download **3D-Print-Backup-Windows.zip** below, unzip it and double-click **3D Print Backup.exe**. No install needed.
+
+            If Windows says "Windows protected your PC", click **More info**, then **Run anyway**.
           files: 3D-Print-Backup-Windows.zip
+          make_latest: true
