@@ -51,7 +51,8 @@ nothing on your computer to back up.
 Python is built into the `.exe`, so you don't need to install anything.
 
 > **"Windows protected your PC"?** Windows shows this for programs that aren't
-> "signed" (signing costs money each year). Click **More info → Run anyway**.
+> "code‑signed" yet. Click **More info → Run anyway**. (Setting up signing is
+> explained in [docs/code-signing.md](docs/code-signing.md).)
 
 **Tip:** right‑click a `.3dbackup` file → **Open with** → **Choose another app** → pick
 `3D Print Backup.exe` and tick "Always". Now double‑clicking a backup opens it.

@@ -48,6 +48,36 @@ jobs:
       - name: Build the exe files
         run: python packaging/build.py
 
+      # Code signing stops Windows calling the app an "unknown publisher".
+      # It only runs once the signing account is set up (see
+      # docs/code-signing.md); until then the exe is built unsigned.
+      # Pull requests from other people's copies never get signed.
+      - name: Sign the exe files (Azure Artifact Signing)
+        if: vars.SIGNING_ACCOUNT != '' && github.event_name != 'pull_request'
+        uses: azure/artifact-signing-action@v2
+        with:
+          azure-tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          azure-client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          azure-client-secret: ${{ secrets.AZURE_CLIENT_SECRET }}
+          endpoint: ${{ vars.SIGNING_ENDPOINT }}
+          signing-account-name: ${{ vars.SIGNING_ACCOUNT }}
+          certificate-profile-name: ${{ vars.SIGNING_PROFILE }}
+          files-folder: ${{ github.workspace }}\dist
+          files-folder-filter: exe
+          file-digest: SHA256
+          timestamp-rfc3161: http://timestamp.acs.microsoft.com
+          timestamp-digest: SHA256
+
+      - name: Check the signature
+        if: vars.SIGNING_ACCOUNT != '' && github.event_name != 'pull_request'
+        shell: pwsh
+        run: |
+          Get-ChildItem dist\*.exe | ForEach-Object {
+            $sig = Get-AuthenticodeSignature $_.FullName
+            Write-Host "$($_.Name): $($sig.Status) - $($sig.SignerCertificate.Subject)"
+            if ($sig.Status -ne 'Valid') { throw "$($_.Name) is not signed correctly" }
+          }
+
       - name: Check the exe works
         shell: pwsh
         run: |
