@@ -1,0 +1,5 @@
+# Netlify settings for the download page (3dbackup.codehound.org).
+# The page is plain HTML in the site/ folder - nothing to build.
+[build]
+  publish = "site"
+  command = ""

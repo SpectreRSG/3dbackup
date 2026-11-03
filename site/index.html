@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>3D Print Backup — CodeHound</title>
+<meta name="description" content="Free Windows app that finds your 3D printing programs and saves every printer, filament, resin and slicer profile in one backup file.">
+<link rel="icon" type="image/png" href="favicon.png">
+<style>
+  :root {
+    --bg: #f5f6f8; --surface: #ffffff; --border: #e2e5e9;
+    --text: #1f2328; --muted: #6b7280; --accent: #2563eb; --accent-dark: #1d4ed8;
+    --accent-soft: #e8effd; --success: #16a34a;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #111418; --surface: #1a1e24; --border: #2b3139;
+      --text: #e8eaed; --muted: #9aa3ae; --accent: #3b82f6; --accent-dark: #2563eb;
+      --accent-soft: #1c2a44; --success: #22c55e;
+    }
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font: 16px/1.6 "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  }
+  a { color: var(--accent); }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 0 16px; }
+
+  header { padding: 18px 0; }
+  header .wrap { display: flex; align-items: center; justify-content: space-between; }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; color: var(--text); text-decoration: none; }
+  .brand img { width: 28px; height: 28px; border-radius: 7px; }
+  header nav a { color: var(--muted); text-decoration: none; font-size: 15px; }
+  header nav a:hover { color: var(--text); }
+
+  .hero { text-align: center; padding: 48px 0 32px; }
+  .hero h1 { font-size: clamp(32px, 6vw, 52px); line-height: 1.1; margin: 0 0 14px; letter-spacing: -0.02em; }
+  .hero p.lead { font-size: clamp(17px, 2.4vw, 20px); color: var(--muted); max-width: 620px; margin: 0 auto 30px; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: var(--accent); color: #fff; text-decoration: none; font-weight: 600;
+    padding: 14px 26px; border-radius: 10px; font-size: 17px;
+    transition: background .15s ease, transform .15s ease;
+  }
+  .btn:hover { background: var(--accent-dark); transform: translateY(-1px); }
+  .btn svg { width: 20px; height: 20px; }
+  .meta { margin-top: 12px; color: var(--muted); font-size: 14px; }
+
+  .shot { margin: 40px auto 0; max-width: 900px; }
+  .shot img {
+    width: 100%; height: auto; display: block; border-radius: 12px;
+    border: 1px solid var(--border); box-shadow: 0 20px 50px -20px rgba(15, 23, 42, .25);
+  }
+
+  section { padding: 56px 0; }
+  h2 { font-size: 26px; margin: 0 0 8px; letter-spacing: -0.01em; }
+  .sub { color: var(--muted); margin: 0 0 28px; }
+
+  .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 22px; }
+  .num {
+    width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center;
+    background: var(--accent-soft); color: var(--accent); font-weight: 700; margin-bottom: 12px;
+  }
+  .card h3 { margin: 0 0 6px; font-size: 18px; }
+  .card p { margin: 0; color: var(--muted); font-size: 15px; }
+
+  .apps { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+  .apps .card h3 { font-size: 15px; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 10px; }
+  .apps .card p { color: var(--text); }
+
+  .split { display: grid; grid-template-columns: 1.1fr 1fr; gap: 32px; align-items: center; }
+  .split img { width: 100%; height: auto; border-radius: 12px; border: 1px solid var(--border); }
+  ul.checks { list-style: none; padding: 0; margin: 0; }
+  ul.checks li { padding-left: 28px; position: relative; margin: 10px 0; }
+  ul.checks li::before { content: "✓"; position: absolute; left: 0; color: var(--success); font-weight: 700; }
+
+  .note { background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--accent); border-radius: 10px; padding: 16px 20px; color: var(--muted); font-size: 15px; }
+  .note strong { color: var(--text); }
+
+  .cta { text-align: center; }
+  footer { padding: 32px 0 40px; color: var(--muted); font-size: 14px; text-align: center; border-top: 1px solid var(--border); }
+
+  @media (max-width: 760px) {
+    .steps, .apps, .split { grid-template-columns: 1fr; }
+    .hero { padding-top: 24px; }
+    section { padding: 40px 0; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <a class="brand" href="/"><img src="favicon.png" alt="">3D Print Backup</a>
+    <nav><a href="https://github.com/SpectreRSG/3dbackup">Source code</a></nav>
+  </div>
+</header>
+
+<main>
+  <div class="hero wrap">
+    <h1>Never lose your print settings again.</h1>
+    <p class="lead">3D Print Backup finds your slicers and saves every printer, filament, resin and print profile into one file, ready for when you reinstall or switch computers.</p>
+    <a class="btn" href="/download">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11"/><path d="m7 10 5 5 5-5"/><path d="M5 19h14"/></svg>
+      Download for Windows
+    </a>
+    <div class="meta">Free · Windows 10 &amp; 11 · about 24 MB · nothing to install</div>
+    <div class="shot"><img src="screen-home.png" width="980" height="640" alt="The 3D Print Backup window with two choices: Back up, and Open a backup"></div>
+  </div>
+
+  <section>
+    <div class="wrap">
+      <h2>How it works</h2>
+      <p class="sub">Two buttons. That's the whole app.</p>
+      <div class="steps">
+        <div class="card"><div class="num">1</div><h3>Back up</h3><p>It finds your 3D printing programs and shows what it found, like “3 printers · 12 filaments”.</p></div>
+        <div class="card"><div class="num">2</div><h3>Keep the file safe</h3><p>Everything goes into one <code>.3dbackup</code> file. Put it on a USB stick or cloud drive.</p></div>
+        <div class="card"><div class="num">3</div><h3>Open it anytime</h3><p>See every setting, search for one, or put your profiles back with one click.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap split">
+      <img src="screen-viewer.png" width="980" height="640" loading="lazy" alt="A backup opened in the app, showing a filament profile's temperature settings">
+      <div>
+        <h2>See exactly what you saved</h2>
+        <p class="sub">Open a backup and browse your profiles as a simple setting and value list.</p>
+        <ul class="checks">
+          <li>Copy a temperature or retraction setting by hand</li>
+          <li>Restore one profile, one program, or everything</li>
+          <li>Files it replaces are kept as a copy, so nothing is lost</li>
+          <li>Works offline. Your settings never leave your computer.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <h2>Works with</h2>
+      <p class="sub">It looks for these programs automatically.</p>
+      <div class="apps">
+        <div class="card"><h3>Filament slicers</h3><p>PrusaSlicer, OrcaSlicer, Bambu Studio, UltiMaker Cura, Creality Print, SuperSlicer, ElegooSlicer, Anycubic Slicer Next, QIDI Studio, Snapmaker Orca, Orca‑Flashforge, ideaMaker, Simplify3D</p></div>
+        <div class="card"><h3>Resin slicers</h3><p>CHITUBOX, Lychee Slicer, PreForm, UVtools, plus PrusaSlicer resin profiles</p></div>
+        <div class="card"><h3>Modelling &amp; CAD</h3><p>Blender, FreeCAD, OpenSCAD</p></div>
+        <div class="card"><h3>Printer hosts</h3><p>Klipper / Moonraker, OctoPrint</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <div class="note"><strong>Windows says “Windows protected your PC”?</strong> That appears for new apps that aren't code‑signed yet. Click <strong>More info</strong>, then <strong>Run anyway</strong>. The app is open source, so anyone can <a href="https://github.com/SpectreRSG/3dbackup">read the code</a>.</div>
+    </div>
+  </section>
+
+  <section class="cta">
+    <div class="wrap">
+      <h2>Back up your settings in under a minute</h2>
+      <p class="sub">Unzip, double‑click <strong>3D Print Backup.exe</strong>, and press Back up.</p>
+      <a class="btn" href="/download">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11"/><path d="m7 10 5 5 5-5"/><path d="M5 19h14"/></svg>
+        Download for Windows
+      </a>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">Made by <a href="https://codehound.org">CodeHound</a> · <a href="https://github.com/SpectreRSG/3dbackup/releases">All versions</a></div>
+</footer>
+</body>
+</html>
